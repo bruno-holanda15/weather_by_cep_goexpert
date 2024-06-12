@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,12 +20,13 @@ func main() {
 		output, err := weatherByCEPUsecase.Execute(input)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
 			return
 		}
 
 		w.WriteHeader(http.StatusOK)
 		fmt.Println(output)
-		w.Write([]byte("Requisição viaCep sucesso\n"))
+		json.NewEncoder(w).Encode(output)
 	})
 
 	fmt.Println("Listening http server http://localhost:8083")

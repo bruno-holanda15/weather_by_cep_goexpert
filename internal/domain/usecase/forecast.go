@@ -2,12 +2,14 @@ package usecase
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 	"unicode"
 
+	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -18,12 +20,11 @@ type InputWbcUsecase struct {
 }
 
 type OutputWbcUsecase struct {
-	Localidade  string
-	Temperatura float32
+	Location entity.Location
 }
 
 type ViaCepInfo struct {
-	Location string `json:"localidade"`
+	LocationName string `json:"localidade"`
 }
 
 type WeatherApiInfo struct {
@@ -37,71 +38,72 @@ type Current struct {
 type WeatherByCepUsecase struct{}
 
 func (w *WeatherByCepUsecase) Execute(input InputWbcUsecase) (OutputWbcUsecase, error) {
-
-	location, err := getLocation(input.Cep)
+	location := entity.NewLocation()
+	err := location.AddCep(input.Cep)
 	if err != nil {
 		return OutputWbcUsecase{}, err
 	}
 
-	celsiusTemp, err := getCelsiusTemp(location)
+	location.Name, err = getLocationName(input.Cep)
+	if err != nil {
+		return OutputWbcUsecase{}, err
+	}
+
+	location.TempCelsius, err = getCelsiusTemp(location.Name)
 	if err != nil {
 		return OutputWbcUsecase{}, err
 	}
 
 	return OutputWbcUsecase{
-		Localidade:  location,
-		Temperatura: celsiusTemp,
+		Location: *location,
 	}, nil
 }
 
-func getLocation(cep string) (string, error) {
+func getLocationName(cep string) (string, error) {
 	resViaCep, err := http.Get("http://viacep.com.br/ws/" + cep + "/json/")
 
 	if err != nil {
-		return "", err
+		return "", errors.New("error executing request to viacep")
 	}
 	defer resViaCep.Body.Close()
 
 	body, err := io.ReadAll(resViaCep.Body)
 	if err != nil {
-		return "", err
+		return "", errors.New("error reading body from viacep response")
 	}
 
 	var viaCepInfo ViaCepInfo
 	err = json.Unmarshal(body, &viaCepInfo)
 	if err != nil {
-		return "", err
+		return "", errors.New("error doing unmarshal from viacep body")
 	}
-	fmt.Println(body, viaCepInfo, "aqui")
 
-	viaCepInfo.Location, err = removeAccents(viaCepInfo.Location)
+	viaCepInfo.LocationName, err = removeAccents(viaCepInfo.LocationName)
 	if err != nil {
-		return "", err
+		return "", errors.New("error removing accents")
 	}
 
-	return viaCepInfo.Location, nil
+	return viaCepInfo.LocationName, nil
 }
 
 func getCelsiusTemp(location string) (float32, error) {
 	urlWeather := fmt.Sprintf("http://api.weatherapi.com/v1/current.json?key=ad23180c91fc43eba2d232304241106&q=%s", strings.Replace(location, " ", "+", -1))
 
-	fmt.Println(urlWeather)
 	resWeatherApi, err := http.Get(urlWeather)
 	if err != nil {
-		return 0, err
+		return 0, errors.New("error executing request to weatherapi")
 	}
 	defer resWeatherApi.Body.Close()
 
 	bodyWeather, err := io.ReadAll(resWeatherApi.Body)
-	fmt.Println(string(bodyWeather))
 	if err != nil {
-		return 0, err
+		return 0, errors.New("error reading body from weatherapi response")
 	}
 
 	var weatherInfo WeatherApiInfo
 	err = json.Unmarshal(bodyWeather, &weatherInfo)
 	if err != nil {
-		return 0, err
+		return 0, errors.New("error doing unmarshal from weatherapi body")
 	}
 
 	return weatherInfo.Current.TempCelsius, nil
