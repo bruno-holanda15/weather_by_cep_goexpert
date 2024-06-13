@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-
 	weatherByCEPUsecase := usecase.WeatherByCepUsecase{}
 
 	http.HandleFunc("/weather/{cep}", func(w http.ResponseWriter, r *http.Request) {

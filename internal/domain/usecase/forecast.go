@@ -9,6 +9,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/bruno-holanda15/weather_by_cep_goexpert/configs"
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
@@ -87,7 +88,8 @@ func getLocationName(cep string) (string, error) {
 }
 
 func getCelsiusTemp(location string) (float32, error) {
-	urlWeather := fmt.Sprintf("http://api.weatherapi.com/v1/current.json?key=ad23180c91fc43eba2d232304241106&q=%s", strings.Replace(location, " ", "+", -1))
+	apiToken := configs.Env("WEATHER_TOKEN")
+	urlWeather := fmt.Sprintf("http://api.weatherapi.com/v1/current.json?key="+apiToken+"&q=%s", strings.Replace(location, " ", "+", -1))
 
 	resWeatherApi, err := http.Get(urlWeather)
 	if err != nil {
