@@ -79,6 +79,10 @@ func getLocationName(cep string) (string, error) {
 		return "", errors.New("error doing unmarshal from viacep body")
 	}
 
+	if viaCepInfo.LocationName == "" {
+		return "", errors.New("unable to find location by cep")
+	}
+
 	viaCepInfo.LocationName, err = removeAccents(viaCepInfo.LocationName)
 	if err != nil {
 		return "", errors.New("error removing accents")
