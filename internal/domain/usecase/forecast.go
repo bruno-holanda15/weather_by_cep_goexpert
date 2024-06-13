@@ -21,7 +21,9 @@ type InputWbcUsecase struct {
 }
 
 type OutputWbcUsecase struct {
-	Location entity.Location
+	TempCelsius    float32 `json:"temp_C"`
+	TempFahrenheit float32 `json:"temp_F"`
+	TempKelvin     float32 `json:"temp_K"`
 }
 
 type ViaCepInfo struct {
@@ -51,12 +53,15 @@ func (w *WeatherByCepUsecase) Execute(input InputWbcUsecase) (OutputWbcUsecase, 
 	}
 
 	location.TempCelsius, err = getCelsiusTemp(location.Name)
+	location.FillOtherTempsFromCelsius()
 	if err != nil {
 		return OutputWbcUsecase{}, err
 	}
 
 	return OutputWbcUsecase{
-		Location: *location,
+		TempCelsius: location.TempCelsius,
+		TempFahrenheit: location.TempFahrenheit,
+		TempKelvin: location.TempKelvin,
 	}, nil
 }
 

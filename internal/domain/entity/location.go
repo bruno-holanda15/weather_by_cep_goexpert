@@ -32,3 +32,8 @@ func isCepValid(cep string) error {
 
 	return nil
 }
+
+func (l *Location) FillOtherTempsFromCelsius() {
+	l.TempFahrenheit = l.TempCelsius * 1.8 + 32
+	l.TempKelvin = l.TempCelsius + 273
+}
