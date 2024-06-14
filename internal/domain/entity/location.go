@@ -7,6 +7,7 @@ import (
 
 var (
 	InvalidCep = errors.New("invalid cep")
+	ErrorCelsiusEmpty = errors.New("temp Celsius not completed yet")
 )
 
 type Location struct {
@@ -37,7 +38,12 @@ func isCepValid(cep string) error {
 	return nil
 }
 
-func (l *Location) FillOtherTempsFromCelsius() {
+func (l *Location) FillOtherTempsFromCelsius() error {
+	if l.TempCelsius == 0 {
+		return ErrorCelsiusEmpty
+	}
+
 	l.TempFahrenheit = l.TempCelsius*1.8 + 32
 	l.TempKelvin = l.TempCelsius + 273
+	return nil
 }

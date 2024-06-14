@@ -64,7 +64,11 @@ func (w *WeatherByCepUsecase) Execute(input InputWbcUsecase) (OutputWbcUsecase, 
 	}
 
 	location.TempCelsius, err = getCelsiusTemp(location.Name)
-	location.FillOtherTempsFromCelsius()
+	if err != nil {
+		return OutputWbcUsecase{}, err
+	}
+
+	err = location.FillOtherTempsFromCelsius()
 	if err != nil {
 		return OutputWbcUsecase{}, err
 	}
