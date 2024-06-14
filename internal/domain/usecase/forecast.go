@@ -16,6 +16,17 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
+var (
+	CanNotFindLocation = errors.New("unable to find location by cep")
+	ErrorExecutingRequestViaCep = errors.New("error executing request to viacep")
+	ErrorReadingBodyViaCep = errors.New("error reading body from viacep response")
+	ErrorUnsmarshalViaCep = errors.New("error unmarshal from viacep body")
+	ErrorExecutingRequestWeatherApi = errors.New("error executing request to weatherApi")
+	ErrorReadingBodyWeatherApi = errors.New("error reading body from weatherApi response")
+	ErrorUnsmarshalWeatherApi = errors.New("error unmarshal from weatherApi body")
+	ErrorRemovingAccents = errors.New("error removing accents")
+)
+
 type InputWbcUsecase struct {
 	Cep string
 }
@@ -69,28 +80,28 @@ func getLocationName(cep string) (string, error) {
 	resViaCep, err := http.Get("http://viacep.com.br/ws/" + cep + "/json/")
 
 	if err != nil {
-		return "", errors.New("error executing request to viacep")
+		return "", ErrorExecutingRequestViaCep
 	}
 	defer resViaCep.Body.Close()
 
 	body, err := io.ReadAll(resViaCep.Body)
 	if err != nil {
-		return "", errors.New("error reading body from viacep response")
+		return "", ErrorReadingBodyViaCep
 	}
 
 	var viaCepInfo ViaCepInfo
 	err = json.Unmarshal(body, &viaCepInfo)
 	if err != nil {
-		return "", errors.New("error doing unmarshal from viacep body")
+		return "", ErrorUnsmarshalViaCep
 	}
 
 	if viaCepInfo.LocationName == "" {
-		return "", errors.New("unable to find location by cep")
+		return "", CanNotFindLocation
 	}
 
 	viaCepInfo.LocationName, err = removeAccents(viaCepInfo.LocationName)
 	if err != nil {
-		return "", errors.New("error removing accents")
+		return "", ErrorRemovingAccents
 	}
 
 	return viaCepInfo.LocationName, nil
@@ -102,19 +113,19 @@ func getCelsiusTemp(location string) (float32, error) {
 
 	resWeatherApi, err := http.Get(urlWeather)
 	if err != nil {
-		return 0, errors.New("error executing request to weatherapi")
+		return 0, ErrorExecutingRequestWeatherApi
 	}
 	defer resWeatherApi.Body.Close()
 
 	bodyWeather, err := io.ReadAll(resWeatherApi.Body)
 	if err != nil {
-		return 0, errors.New("error reading body from weatherapi response")
+		return 0, ErrorReadingBodyWeatherApi
 	}
 
 	var weatherInfo WeatherApiInfo
 	err = json.Unmarshal(bodyWeather, &weatherInfo)
 	if err != nil {
-		return 0, errors.New("error doing unmarshal from weatherapi body")
+		return 0, ErrorUnsmarshalWeatherApi
 	}
 
 	return weatherInfo.Current.TempCelsius, nil

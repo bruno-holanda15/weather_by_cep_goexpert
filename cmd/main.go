@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/usecase"
 )
 
@@ -18,6 +19,18 @@ func main() {
 
 		output, err := weatherByCEPUsecase.Execute(input)
 		if err != nil {
+			if err == usecase.CanNotFindLocation {
+				w.WriteHeader(http.StatusNotFound)
+				w.Write([]byte(err.Error()))
+				return
+			}
+
+			if err == entity.InvalidCep {
+				w.WriteHeader(http.StatusUnprocessableEntity)
+				w.Write([]byte(err.Error()))
+				return
+			}
+
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return

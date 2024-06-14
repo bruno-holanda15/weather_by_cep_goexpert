@@ -5,6 +5,10 @@ import (
 	"strings"
 )
 
+var (
+	InvalidCep = errors.New("invalid cep")
+)
+
 type Location struct {
 	Cep            string
 	Name           string
@@ -27,13 +31,13 @@ func (l *Location) AddCep(cep string) error {
 
 func isCepValid(cep string) error {
 	if strings.NewReader(cep).Size() != 8 {
-		return errors.New("invalid cep")
+		return InvalidCep
 	}
 
 	return nil
 }
 
 func (l *Location) FillOtherTempsFromCelsius() {
-	l.TempFahrenheit = l.TempCelsius * 1.8 + 32
+	l.TempFahrenheit = l.TempCelsius*1.8 + 32
 	l.TempKelvin = l.TempCelsius + 273
 }
