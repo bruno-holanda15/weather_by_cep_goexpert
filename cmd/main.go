@@ -1,45 +1,19 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/usecase"
+	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/infra/web"
 )
 
 func main() {
 	weatherByCEPUsecase := usecase.WeatherByCepUsecase{}
+	wbcHandler := web.NewWeatherByCepHttp(weatherByCEPUsecase)
 
-	http.HandleFunc("/weather/{cep}", func(w http.ResponseWriter, r *http.Request) {
-		cep := r.PathValue("cep")
-		input := usecase.InputWbcUsecase{Cep: cep}
-
-		output, err := weatherByCEPUsecase.Execute(input)
-		if err != nil {
-			if err == usecase.CanNotFindLocation {
-				w.WriteHeader(http.StatusNotFound)
-				w.Write([]byte(err.Error()))
-				return
-			}
-
-			if err == entity.InvalidCep {
-				w.WriteHeader(http.StatusUnprocessableEntity)
-				w.Write([]byte(err.Error()))
-				return
-			}
-
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(err.Error()))
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-		fmt.Println(output)
-		json.NewEncoder(w).Encode(output)
-	})
+	http.Handle("/weather/{cep}", wbcHandler)
 
 	fmt.Println("Listening http server http://localhost:8083")
 	if err := http.ListenAndServe(":8083", nil); err != nil {
