@@ -6,10 +6,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-const (
-	Development = "development"
-)
-
 type Loader struct{}
 
 // I think it's easier and direct that way
@@ -36,21 +32,9 @@ func Env(envAndDefault ...string) string {
 	return defaultValue
 }
 
-func Environment() string {
-	appEnv, hasEnv := os.LookupEnv("ENVIRONMENT")
-
-	if !hasEnv {
-		return Development
-	}
-	return appEnv
-}
-
 func (c *Loader) LoadEnv() {
-	appEnv := Environment()
-
-	if appEnv == Development {
-		if err := godotenv.Load(); err != nil {
-			panic("unable to load environment vars")
-		}
+	if err := godotenv.Load(); err != nil {
+		panic("unable to load environment vars")
 	}
 }
+
