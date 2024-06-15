@@ -23,8 +23,9 @@ func (we *WeatherByCepHttp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	cep := r.PathValue("cep")
 	input := usecase.InputWbcUsecase{Cep: cep}
 
-	output, err := we.usecase.Execute(input)
-	if err != nil {
+	output := we.usecase.Execute(input)
+	if output.Err != nil {
+		err := output.Err
 		if err == usecase.CanNotFindLocation {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte(err.Error()))

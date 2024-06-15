@@ -2,6 +2,7 @@ package entity
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 )
 
@@ -18,6 +19,11 @@ type Location struct {
 	TempKelvin     float32
 }
 
+type LocationInterface interface {
+	AddCep(string) error
+	FillOtherTempsFromCelsius() error
+}
+
 func NewLocation() *Location {
 	return &Location{}
 }
@@ -32,6 +38,10 @@ func (l *Location) AddCep(cep string) error {
 
 func isCepValid(cep string) error {
 	if strings.NewReader(cep).Size() != 8 {
+		return InvalidCep
+	}
+
+	if _,err := strconv.Atoi(cep); err != nil {
 		return InvalidCep
 	}
 

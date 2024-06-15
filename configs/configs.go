@@ -4,42 +4,16 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/spf13/viper"
 )
 
-type conf struct {
-	WeatherApiToken string `mapstructure:"WEATHER_API_TOKEN"`
-}
+const (
+	Development = "development"
+)
 
-// fullcycle way of loading envs
-// but, I don't like the idea of when I want to
-// load a specific env, I need to LoadConfig then
-// put conf.ENV_I_WANT for example
-func LoadConfig(path string) (*conf, error) {
-	var cfg *conf
-	viper.SetConfigName("app_config")
-	viper.SetConfigType("env")
-	viper.AddConfigPath(path)
-	viper.SetConfigFile(".env")
-	viper.AutomaticEnv()
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(err)
-	}
-	err = viper.Unmarshal(&cfg)
-	if err != nil {
-		panic(err)
-	}
-
-	return cfg, err
-}
+type Loader struct{}
 
 // I think it's easier and direct that way
 func Env(envAndDefault ...string) string {
-	if err := godotenv.Load(); err != nil {
-		panic("NOT ABLE TO LOAD ENVS")
-	}
-
 	if len(envAndDefault) == 0 {
 		return ""
 	}
@@ -60,4 +34,23 @@ func Env(envAndDefault ...string) string {
 	}
 
 	return defaultValue
+}
+
+func Environment() string {
+	appEnv, hasEnv := os.LookupEnv("ENVIRONMENT")
+
+	if !hasEnv {
+		return Development
+	}
+	return appEnv
+}
+
+func (c *Loader) LoadEnv() {
+	appEnv := Environment()
+
+	if appEnv == Development {
+		if err := godotenv.Load(); err != nil {
+			panic("unable to load environment vars")
+		}
+	}
 }

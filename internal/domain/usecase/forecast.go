@@ -35,6 +35,7 @@ type OutputWbcUsecase struct {
 	TempCelsius    float32 `json:"temp_C"`
 	TempFahrenheit float32 `json:"temp_F"`
 	TempKelvin     float32 `json:"temp_K"`
+	Err error
 }
 
 type ViaCepInfo struct {
@@ -51,36 +52,37 @@ type Current struct {
 
 type WeatherByCepUsecase struct{}
 
-func (w *WeatherByCepUsecase) Execute(input InputWbcUsecase) (OutputWbcUsecase, error) {
+func (w *WeatherByCepUsecase) Execute(input InputWbcUsecase) OutputWbcUsecase {
 	location := entity.NewLocation()
 	err := location.AddCep(input.Cep)
 	if err != nil {
-		return OutputWbcUsecase{}, err
+		return OutputWbcUsecase{Err: err}
 	}
 
-	location.Name, err = getLocationName(input.Cep)
+	location.Name, err = GetLocationName(input.Cep)
 	if err != nil {
-		return OutputWbcUsecase{}, err
+		return OutputWbcUsecase{Err: err}
 	}
 
-	location.TempCelsius, err = getCelsiusTemp(location.Name)
+	location.TempCelsius, err = GetCelsiusTemp(location.Name)
 	if err != nil {
-		return OutputWbcUsecase{}, err
+		return OutputWbcUsecase{Err: err}
 	}
 
 	err = location.FillOtherTempsFromCelsius()
 	if err != nil {
-		return OutputWbcUsecase{}, err
+		return OutputWbcUsecase{Err: err}
 	}
 
 	return OutputWbcUsecase{
 		TempCelsius: location.TempCelsius,
 		TempFahrenheit: location.TempFahrenheit,
 		TempKelvin: location.TempKelvin,
-	}, nil
+		Err: nil,
+	}
 }
 
-func getLocationName(cep string) (string, error) {
+func GetLocationName(cep string) (string, error) {
 	resViaCep, err := http.Get("http://viacep.com.br/ws/" + cep + "/json/")
 
 	if err != nil {
@@ -111,8 +113,8 @@ func getLocationName(cep string) (string, error) {
 	return viaCepInfo.LocationName, nil
 }
 
-func getCelsiusTemp(location string) (float32, error) {
-	apiToken := configs.Env("WEATHER_TOKEN")
+func GetCelsiusTemp(location string) (float32, error) {
+	apiToken := configs.Env("WEATHER_TOKEN", "Teste")
 	urlWeather := fmt.Sprintf("http://api.weatherapi.com/v1/current.json?key="+apiToken+"&q=%s", strings.Replace(location, " ", "+", -1))
 
 	resWeatherApi, err := http.Get(urlWeather)

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/bruno-holanda15/weather_by_cep_goexpert/configs"
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/usecase"
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/infra/web"
 )
@@ -19,4 +20,9 @@ func main() {
 	if err := http.ListenAndServe(":8083", nil); err != nil {
 		log.Fatalf("error starting http server - %v", err)
 	}
+}
+
+func init() {
+	loader := &configs.Loader{}
+	loader.LoadEnv()
 }

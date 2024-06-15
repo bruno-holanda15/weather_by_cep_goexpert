@@ -1,0 +1,18 @@
+mode: set
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/mocks/forecast_mock.go:8.60,10.57 1 0
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/mocks/forecast_mock.go:10.57,10.73 1 0
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/mocks/forecast_mock.go:11.62,11.77 1 0
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/mocks/forecast_mock.go:15.79,17.2 1 0
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/mocks/forecast_mock.go:19.84,21.2 1 0
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:22.30,24.2 1 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:26.45,27.40 1 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:27.40,29.3 1 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:30.2,31.12 2 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:34.35,35.40 1 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:35.40,37.3 1 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:39.2,39.44 1 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:39.44,41.3 1 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:43.2,43.12 1 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:46.54,47.24 1 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:47.24,49.3 1 1
+github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity/location.go:51.2,53.12 3 1

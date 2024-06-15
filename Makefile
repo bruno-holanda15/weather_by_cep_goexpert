@@ -14,3 +14,6 @@ logs:
 
 down:
 	$(COMMAND_DOCKER) down
+
+tests:
+	go test ./...
