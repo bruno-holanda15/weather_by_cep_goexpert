@@ -10,10 +10,10 @@ import (
 )
 
 type WeatherByCepHttp struct {
-	usecase usecase.WeatherByCepUsecase
+	usecase *usecase.WeatherByCepUsecase
 }
 
-func NewWeatherByCepHttp(usecase usecase.WeatherByCepUsecase) *WeatherByCepHttp {
+func NewWeatherByCepHttp(usecase *usecase.WeatherByCepUsecase) *WeatherByCepHttp {
 	return &WeatherByCepHttp{
 		usecase: usecase,
 	}
@@ -26,13 +26,13 @@ func (we *WeatherByCepHttp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	output := we.usecase.Execute(input)
 	if output.Err != nil {
 		err := output.Err
-		if err == usecase.CanNotFindLocation {
+		if err == entity.ErrorCanNotFindLocation {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte(err.Error()))
 			return
 		}
 
-		if err == entity.InvalidCep {
+		if err == entity.ErrorInvalidCep {
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			w.Write([]byte(err.Error()))
 			return
