@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	CanNotFindLocation              = errors.New("unable to find location by cep")
+	ErrorCanNotFindLocation         = errors.New("unable to find location by cep")
 	ErrorExecutingRequestViaCep     = errors.New("error executing request to viacep")
 	ErrorReadingBodyViaCep          = errors.New("error reading body from viacep response")
 	ErrorUnsmarshalViaCep           = errors.New("error unmarshal from viacep body")
