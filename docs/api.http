@@ -1,4 +1,10 @@
-GET http://localhost:8083/weather/88020210 HTTP/1.1
+GET http://localhost:8080/weather/88020210 HTTP/1.1
 Host: localhost:8083
+Content-Type: application/json
+Accept: application/json
+
+###
+GET https://weather-by-cep-goexpert-hnqbexw6fq-rj.a.run.app/weather/88020210 HTTP/1.1
+Host: weather-by-cep-goexpert-hnqbexw6fq-rj.a.run.app
 Content-Type: application/json
 Accept: application/json

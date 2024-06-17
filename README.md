@@ -1,6 +1,10 @@
 ## Resumo
 Projeto proposto na Pós Goexpert da Fullcycle.
 
+## Testes
+- `make tests`
+- Para testar o deploy da google cloud run acesse a url https://weather-by-cep-goexpert-hnqbexw6fq-rj.a.run.app/weather/88020210
+
 ## Objetivo
 Desenvolver um sistema em Go que receba um CEP, identifica a cidade e retorna o clima atual (temperatura em graus celsius, fahrenheit e kelvin). Esse sistema deverá ser publicado no Google Cloud Run.
 

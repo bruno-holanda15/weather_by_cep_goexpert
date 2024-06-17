@@ -16,4 +16,4 @@ down:
 	$(COMMAND_DOCKER) down
 
 tests:
-	go test ./...
+	go test --count=1 -coverprofile=coverage.out $(shell go list ./... | grep internal/domain)

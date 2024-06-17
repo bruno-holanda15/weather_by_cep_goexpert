@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -34,7 +35,7 @@ func Env(envAndDefault ...string) string {
 
 func (c *Loader) LoadEnv() {
 	if err := godotenv.Load(); err != nil {
-		panic("unable to load environment vars")
+		log.Fatalf("error loading env vars: %v", err)
 	}
 }
 
