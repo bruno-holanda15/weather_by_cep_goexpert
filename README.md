@@ -2,6 +2,7 @@
 Projeto proposto na Pós Goexpert da Fullcycle.
 
 ## Testes
+- Adicione o arquivo .env  com a variável WEATHER_TOKEN="TOKEN_DA_WEATHERAPI" na raiz do projeto com o seu token para a api da WeatherAPI para busca de informações
 - `make tests`
 - Para testar o deploy da google cloud run acesse a url https://weather-by-cep-goexpert-hnqbexw6fq-rj.a.run.app/weather/88020210
 
