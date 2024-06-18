@@ -20,7 +20,7 @@ func NewInfosSearcher() *InfosSearcher {
 }
 
 func (l *InfosSearcher) AddCep(cep string) (string, error) {
-	err := isCepValid(cep)
+	err := IsCepValid(cep)
 	if err != nil {
 		return "", err
 	}
@@ -28,7 +28,7 @@ func (l *InfosSearcher) AddCep(cep string) (string, error) {
 	return cep, err
 }
 
-func isCepValid(cep string) error {
+func IsCepValid(cep string) error {
 	if strings.NewReader(cep).Size() != 8 {
 		return ErrorInvalidCep
 	}

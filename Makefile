@@ -9,8 +9,11 @@ endif
 up:
 	$(COMMAND_DOCKER) up -d
 
-logs:
-	docker logs --tail 50 -f go_wbc
+logs-cep-validator:
+	docker logs --tail 50 -f go_wbc1
+
+logs-wbc:
+	docker logs --tail 50 -f go_wb2
 
 down:
 	$(COMMAND_DOCKER) down

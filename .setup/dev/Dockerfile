@@ -11,4 +11,4 @@ RUN apt-get update && \
   go install github.com/githubnemo/CompileDaemon@latest && \
   go mod download
 
-ENTRYPOINT ["CompileDaemon", "-directory=./", "-build=go build -o weather-by-cep /app/cmd/main.go", "-command=./weather-by-cep"]
+ENTRYPOINT ["CompileDaemon", "-directory=./", "-build=go build -o weather-by-cep /app/main.go", "-command=./weather-by-cep"]
