@@ -27,9 +27,8 @@ func StartValidator(cmd *cobra.Command, args []string) {
 	validateCepHandler := web.NewValidateCepHttp(validateCepUsecase)
 
 	http.HandleFunc("/weather", validateCepHandler.ValidateCep)
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("toptop demais"))
+		w.Write([]byte("Hello cep validator!"))
 	})
 
 	fmt.Println("Listening http server http://localhost:8082")

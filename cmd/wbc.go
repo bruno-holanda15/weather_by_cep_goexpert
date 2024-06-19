@@ -19,7 +19,7 @@ import (
 var wbcCmd = &cobra.Command{
 	Use:   "wbc",
 	Short: "Return weather by cep",
-	Long:  "Search weather by informing a specific cep.",
+	Long:  "Search weather by informing a specific cep, we created a shortcut/acronym wbc :)",
 	Run:   StartWbc,
 }
 
@@ -34,6 +34,9 @@ func StartWbc(cmd *cobra.Command, args []string) {
 	wbcHandler := web.NewWeatherByCepHttp(weatherByCEPUsecase)
 
 	http.HandleFunc("/weather/{cep}", wbcHandler.FindTemps)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello weather by cep!"))
+	})
 
 	fmt.Println("Listening http server http://localhost:8082")
 	if err := http.ListenAndServe(":8082", nil); err != nil {
