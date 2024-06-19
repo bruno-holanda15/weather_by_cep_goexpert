@@ -33,7 +33,7 @@ func StartWbc(cmd *cobra.Command, args []string) {
 	weatherByCEPUsecase := usecase.NewWeatherByCepUsecase(infoSearcher)
 	wbcHandler := web.NewWeatherByCepHttp(weatherByCEPUsecase)
 
-	http.Handle("/weather/{cep}", wbcHandler)
+	http.HandleFunc("/weather/{cep}", wbcHandler.FindTemps)
 
 	fmt.Println("Listening http server http://localhost:8082")
 	if err := http.ListenAndServe(":8082", nil); err != nil {

@@ -3,7 +3,6 @@ package web
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
@@ -20,14 +19,20 @@ func NewWeatherByCepHttp(usecase *usecase.WeatherByCepUsecase) *WeatherByCepHttp
 	}
 }
 
-func (we *WeatherByCepHttp) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (we *WeatherByCepHttp) FindTemps(w http.ResponseWriter, r *http.Request) {
 	cep := r.PathValue("cep")
 	input := usecase.InputWbcUsecase{Cep: cep}
 
 	output := we.usecase.Execute(input)
 	if output.Err != nil {
 		err := output.Err
-		if err == entity.ErrorCanNotFindLocation ||  err == entity.ErrorInvalidCep {
+		if err == entity.ErrorCanNotFindLocation {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		if err == entity.ErrorInvalidCep {
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			w.Write([]byte(err.Error()))
 			return
@@ -47,44 +52,44 @@ type CepBody struct {
 	Cep string `json:"cep"`
 }
 
-func ValidateCep(w http.ResponseWriter, r *http.Request) {
-	var reqBody CepBody
+type ValidateCepHttp struct {
+	usecase *usecase.ValidateCepUsecase
+}
 
-	err := json.NewDecoder(r.Body).Decode(&reqBody)
-	if err != nil || reqBody.Cep == "" {
-		http.Error(w, "Invalid request body", http.StatusUnprocessableEntity)
+func NewValidateCepHttp(usecase *usecase.ValidateCepUsecase) *ValidateCepHttp {
+	return &ValidateCepHttp{
+		usecase: usecase,
+	}
+}
+
+func (v *ValidateCepHttp) ValidateCep(w http.ResponseWriter, r *http.Request) {
+	var input usecase.InputWbcUsecase
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil || input.Cep == "" {
+		http.Error(w, "Invalid zipcode", http.StatusUnprocessableEntity)
 		return
 	}
 
-	err = entity.IsCepValid(reqBody.Cep)
-	if err != nil {
-		http.Error(w, "Invalid cep", http.StatusUnprocessableEntity)
+	output := v.usecase.Execute(input)
+	if err := output.Err; err != nil {
+		if err == entity.ErrorInvalidCep {
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			w.Write([]byte("invalid zipcode"))
+			return
+		}
+
+		if err == entity.ErrorEmptyCep {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("can not find zipcode"))
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
-	reqWeather, err := http.NewRequest("GET", "http://goapp2:8082/weather/"+reqBody.Cep, nil)
-	if err != nil {
-		http.Error(w, "error preparing request to go_wbc2", http.StatusInternalServerError)
-		return
-	}
-
-	resWeather, err := http.DefaultClient.Do(reqWeather)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer resWeather.Body.Close()
-
-	if resWeather.StatusCode != 200 {
-		w.WriteHeader(resWeather.StatusCode)
-		return
-	}
-
-	weatherBody, err := io.ReadAll(resWeather.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Write(weatherBody)
+	w.WriteHeader(http.StatusOK)
+	fmt.Println(output)
+	json.NewEncoder(w).Encode(output)
 }

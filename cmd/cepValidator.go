@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/usecase"
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/infra/web"
 	"github.com/spf13/cobra"
 )
@@ -22,14 +23,17 @@ var cepValidatorCmd = &cobra.Command{
 func StartValidator(cmd *cobra.Command, args []string) {
 	fmt.Println("cepValidator called")
 
-	http.HandleFunc("/weather", web.ValidateCep)
+	validateCepUsecase := &usecase.ValidateCepUsecase{}
+	validateCepHandler := web.NewValidateCepHttp(validateCepUsecase)
+
+	http.HandleFunc("/weather", validateCepHandler.ValidateCep)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("toptop demais"))
 	})
 
+	fmt.Println("Listening http server http://localhost:8082")
 	http.ListenAndServe(":8081", nil)
-
 }
 
 func init() {
