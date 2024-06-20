@@ -9,25 +9,37 @@ import (
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/usecase"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
 
 type WeatherByCepHttp struct {
 	usecase *usecase.WeatherByCepUsecase
+	tracer trace.Tracer
+
 }
 
-func NewWeatherByCepHttp(usecase *usecase.WeatherByCepUsecase) *WeatherByCepHttp {
+func NewWeatherByCepHttp(usecase *usecase.WeatherByCepUsecase, tracer trace.Tracer) *WeatherByCepHttp {
 	return &WeatherByCepHttp{
 		usecase: usecase,
+		tracer: tracer,
 	}
 }
 
 func (we *WeatherByCepHttp) FindTemps(w http.ResponseWriter, r *http.Request) {
+	carrier := propagation.HeaderCarrier(r.Header)
+	ctx := r.Context()
+	ctx = otel.GetTextMapPropagator().Extract(ctx, carrier)
+	
+	ctx, span := we.tracer.Start(ctx, "find weather Span")
+	span.SetAttributes(attribute.Bool("isFalse", false), attribute.String("greeting", "bye!"))
+	defer span.End()
+	
 	cep := r.PathValue("cep")
 	input := usecase.InputWbcUsecase{Cep: cep}
 
-	output := we.usecase.Execute(input)
+	output := we.usecase.Execute(ctx, input)
 	if output.Err != nil {
 		err := output.Err
 		if err == entity.ErrorCanNotFindLocation {
@@ -74,6 +86,7 @@ func (v *ValidateCepHttp) ValidateCep(w http.ResponseWriter, r *http.Request) {
 	ctx = otel.GetTextMapPropagator().Extract(ctx, carrier)
 
 	ctx, span := v.tracer.Start(ctx, "validateCep Span")
+	span.SetAttributes(attribute.Bool("isTrue", true), attribute.String("greeting", "hi!"))
 	defer span.End()
 	
 	time.Sleep(300*time.Millisecond)

@@ -45,8 +45,6 @@ func InitProvider(serviceName, collectorURL string) (func(context.Context) error
 		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
 	}
 
-	// grpc.NewServer(grpc.StatsHandler(zipkingrpc.NewServerHandler(traceExporter)))
-
 	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
 	tracerProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),

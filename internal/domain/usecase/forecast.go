@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
@@ -27,7 +28,7 @@ func NewWeatherByCepUsecase(infosSearcher entity.InfosSearcherInterface) *Weathe
 	}
 }
 
-func (w *WeatherByCepUsecase) Execute(input InputWbcUsecase) OutputWbcUsecase {
+func (w *WeatherByCepUsecase) Execute(ctx context.Context, input InputWbcUsecase) OutputWbcUsecase {
 	var location entity.Location
 	var cep string
 

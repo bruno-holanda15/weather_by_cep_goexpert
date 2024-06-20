@@ -17,7 +17,9 @@ import (
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/usecase"
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/infra/web"
+	o "github.com/bruno-holanda15/weather_by_cep_goexpert/pkg/otel"
 	"github.com/spf13/cobra"
+	"go.opentelemetry.io/otel"
 )
 
 // wbcCmd represents the wbc command
@@ -37,12 +39,24 @@ func StartWbc(cmd *cobra.Command, args []string) {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT)
 	defer stop()
 
+	shutdown, err := o.InitProvider("cepValidator", "otel-collector:4317")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err := shutdown(ctx); err != nil {
+			log.Fatal("failed to shutdown TracerProvider: %w", err)
+		}
+	}()
+
+	tracer := otel.Tracer("cepValidator-tracer")
+
 	loader := &configs.Loader{}
 	loader.LoadEnv()
 
 	infoSearcher := entity.NewInfosSearcher()
 	weatherByCEPUsecase := usecase.NewWeatherByCepUsecase(infoSearcher)
-	wbcHandler := web.NewWeatherByCepHttp(weatherByCEPUsecase)
+	wbcHandler := web.NewWeatherByCepHttp(weatherByCEPUsecase, tracer)
 
 	http.HandleFunc("/weather/{cep}", wbcHandler.FindTemps)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

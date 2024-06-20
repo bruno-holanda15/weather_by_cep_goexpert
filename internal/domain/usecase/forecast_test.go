@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"testing"
 
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
@@ -12,6 +13,7 @@ func TestWeatherByCepUsecase_Execute(t *testing.T) {
 	inputValid := InputWbcUsecase{Cep: "88010290"}
 	inputInvalid := InputWbcUsecase{Cep: "toptop"}
 	inputNotFound := InputWbcUsecase{Cep: "01234567"}
+	ctx := context.Background()
 
 	tests := []struct {
 		name     string
@@ -92,18 +94,17 @@ func TestWeatherByCepUsecase_Execute(t *testing.T) {
 		mock := mocks.NewInfoSearcherMock()
 		tt.searcher(mock)
 		usecase := NewWeatherByCepUsecase(mock)
-
 		if tt.name == "Valid Cep" {
-			output := usecase.Execute(inputValid)
+			output := usecase.Execute(ctx, inputValid)
 			assert.Equal(t, tt.expected, output)
 		} else if tt.name == "Invalid Cep" {
-			output := usecase.Execute(inputInvalid)
+			output := usecase.Execute(ctx, inputInvalid)
 			assert.Equal(t, tt.expected, output)
 		} else if tt.name == "Cep not found" {
-			output := usecase.Execute(inputNotFound)
+			output := usecase.Execute(ctx, inputNotFound)
 			assert.Equal(t, tt.expected, output)
 		} else {
-			output := usecase.Execute(inputValid)
+			output := usecase.Execute(ctx, inputValid)
 			assert.Equal(t, tt.expected, output)
 		}
 	}
