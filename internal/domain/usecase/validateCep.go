@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -9,14 +10,14 @@ import (
 
 type ValidateCepUsecase struct{}
 
-func (v *ValidateCepUsecase) Execute(input InputWbcUsecase) OutputWbcUsecase {
+func (v *ValidateCepUsecase) Execute(ctx context.Context, input InputWbcUsecase) OutputWbcUsecase {
 
 	err := entity.IsCepValid(input.Cep)
 	if err != nil {
 		return OutputWbcUsecase{Err: err}
 	}
 
-	reqWeather, err := http.NewRequest("GET", "http://goapp2:8082/weather/"+input.Cep, nil)
+	reqWeather, err := http.NewRequestWithContext(ctx, "GET", "http://goapp2:8082/weather/"+input.Cep, nil)
 	if err != nil {
 		return OutputWbcUsecase{Err: err}
 	}

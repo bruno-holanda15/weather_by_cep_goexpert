@@ -4,9 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/usecase"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type WeatherByCepHttp struct {
@@ -54,15 +58,26 @@ type CepBody struct {
 
 type ValidateCepHttp struct {
 	usecase *usecase.ValidateCepUsecase
+	tracer trace.Tracer
 }
 
-func NewValidateCepHttp(usecase *usecase.ValidateCepUsecase) *ValidateCepHttp {
+func NewValidateCepHttp(usecase *usecase.ValidateCepUsecase, tracer trace.Tracer) *ValidateCepHttp {
 	return &ValidateCepHttp{
 		usecase: usecase,
+		tracer: tracer,
 	}
 }
 
 func (v *ValidateCepHttp) ValidateCep(w http.ResponseWriter, r *http.Request) {
+	carrier := propagation.HeaderCarrier(r.Header)
+	ctx := r.Context()
+	ctx = otel.GetTextMapPropagator().Extract(ctx, carrier)
+
+	ctx, span := v.tracer.Start(ctx, "validateCep Span")
+	defer span.End()
+	
+	time.Sleep(300*time.Millisecond)
+
 	var input usecase.InputWbcUsecase
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil || input.Cep == "" {
@@ -70,7 +85,7 @@ func (v *ValidateCepHttp) ValidateCep(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	output := v.usecase.Execute(input)
+	output := v.usecase.Execute(ctx, input)
 	if err := output.Err; err != nil {
 		if err == entity.ErrorInvalidCep {
 			w.WriteHeader(http.StatusUnprocessableEntity)

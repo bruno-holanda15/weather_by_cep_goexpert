@@ -28,12 +28,14 @@ func InitProvider(serviceName, collectorURL string) (func(context.Context) error
 		return nil, fmt.Errorf("failed to create resource: %w", err)
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
-	conn, err := grpc.DialContext(ctx, collectorURL,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
-	)
+	// conn, err := grpc.DialContext(ctx, collectorURL,
+	// 	grpc.WithTransportCredentials(insecure.NewCredentials()),
+	// 	grpc.WithBlock(),
+	// )
+
+	conn, err := grpc.NewClient(collectorURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
 	}
@@ -42,6 +44,8 @@ func InitProvider(serviceName, collectorURL string) (func(context.Context) error
 	if err != nil {
 		return nil, fmt.Errorf("failed to create trace exporter: %w", err)
 	}
+
+	// grpc.NewServer(grpc.StatsHandler(zipkingrpc.NewServerHandler(traceExporter)))
 
 	bsp := sdktrace.NewBatchSpanProcessor(traceExporter)
 	tracerProvider := sdktrace.NewTracerProvider(
