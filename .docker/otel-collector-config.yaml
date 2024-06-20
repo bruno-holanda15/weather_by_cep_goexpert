@@ -4,10 +4,6 @@ receivers:
       grpc:
 
 exporters:
-  otlp:
-    endpoint: zipkin:9411
-    tls:
-      insecure: true
   zipkin:
     endpoint: http://zipkin:9411/api/v2/spans
 
@@ -19,4 +15,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp, zipkin]
+      exporters: [zipkin]

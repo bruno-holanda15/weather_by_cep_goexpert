@@ -39,7 +39,7 @@ func StartWbc(cmd *cobra.Command, args []string) {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT)
 	defer stop()
 
-	shutdown, err := o.InitProvider("cepValidator", "otel-collector:4317")
+	shutdown, err := o.InitProvider("wbc", "otel-collector:4317")
 	if err != nil {
 		log.Fatal(err)
 	}
