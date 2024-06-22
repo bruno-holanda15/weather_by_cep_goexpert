@@ -1,3 +1,7 @@
+## Objetivo
+
+Aplicação de telemetria em sistemas independetes para avaliar tempo de execução dos mesmos.
+
 ## Overview
 
 Projeto proposto na Pós Goexpert da Fullcycle para adição de telemetria utilizando o [OpenTelemetry](https://opentelemetry.io/docs/languages/go/) em conjunto com o [Zipkin](https://zipkin.io/) dentro de dois serviços.
@@ -11,22 +15,6 @@ Podemos visualizar o trace pelo serviço Zipkin na url http://localhost:9411
 
 Adicione o arquivo .env na raiz do seu projeto clonado com a variável WEATHER_TOKEN="TOKEN_DA_WEATHERAPI" na raiz do projeto com o seu token para a api da WeatherAPI para busca de informações, para informações de como criar o token do serviço, acesso o site https://www.weatherapi.com/
 
-[Documentação API](./docs/api.http)
+## Documentação API 
 
-## Objetivo
-
-Aplicação de telemetria em sistemas independetes para avaliar tempo de execução dos mesmos.
-
-## Requisitos
-O sistema deve go_wbc1 receber um CEP válido de 8 digitos e acionar o go_wbc2.
-O sistema go_wbc2 deve realizar a pesquisa do CEP e encontrar o nome da localização, a partir disso, deverá retornar as temperaturas e formata-lás em: Celsius, Fahrenheit, Kelvin.
-O sistema deve responder adequadamente nos seguintes cenários:
-Em caso de sucesso:
-- Código HTTP: 200
-- Response Body: { "temp_C": 28.5, "temp_F": 28.5, "temp_K": 28.5 }
-Em caso de falha, caso o CEP não seja válido (com formato correto):
-- Código HTTP: 422
-- Mensagem: invalid zipcode
-​​​Em caso de falha, caso o CEP não seja encontrado:
-- Código HTTP: 404
-- Mensagem: can not find zipcode
+Arquivo com as [rotas](./docs/api.http)
