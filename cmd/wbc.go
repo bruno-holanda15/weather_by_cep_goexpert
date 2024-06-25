@@ -55,7 +55,7 @@ func StartWbc(cmd *cobra.Command, args []string) {
 	loader.LoadEnv()
 
 	infoSearcher := entity.NewInfosSearcher()
-	weatherByCEPUsecase := usecase.NewWeatherByCepUsecase(infoSearcher)
+	weatherByCEPUsecase := usecase.NewWeatherByCepUsecase(infoSearcher, tracer)
 	wbcHandler := web.NewWeatherByCepHttp(weatherByCEPUsecase, tracer)
 
 	http.HandleFunc("/weather/{cep}", wbcHandler.FindTemps)

@@ -32,10 +32,6 @@ func (we *WeatherByCepHttp) FindTemps(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	ctx = otel.GetTextMapPropagator().Extract(ctx, carrier)
 	
-	ctx, span := we.tracer.Start(ctx, "find weather Span")
-	span.SetAttributes(attribute.Bool("isFalse", false), attribute.String("greeting", "bye!"))
-	defer span.End()
-	
 	cep := r.PathValue("cep")
 	input := usecase.InputWbcUsecase{Cep: cep}
 
@@ -81,11 +77,8 @@ func NewValidateCepHttp(usecase *usecase.ValidateCepUsecase, tracer trace.Tracer
 }
 
 func (v *ValidateCepHttp) ValidateCep(w http.ResponseWriter, r *http.Request) {
-	carrier := propagation.HeaderCarrier(r.Header)
 	ctx := r.Context()
-	ctx = otel.GetTextMapPropagator().Extract(ctx, carrier)
-
-	ctx, span := v.tracer.Start(ctx, "validateCep Span")
+	ctx, span := v.tracer.Start(ctx, "entire flow to receive temperatures")
 	span.SetAttributes(attribute.Bool("isTrue", true), attribute.String("greeting", "hi!"))
 	defer span.End()
 	

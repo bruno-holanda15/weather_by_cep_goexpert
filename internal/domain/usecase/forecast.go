@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/bruno-holanda15/weather_by_cep_goexpert/internal/domain/entity"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -20,11 +21,13 @@ var (
 
 type WeatherByCepUsecase struct {
 	infosSearcher entity.InfosSearcherInterface
+	tracer trace.Tracer
 }
 
-func NewWeatherByCepUsecase(infosSearcher entity.InfosSearcherInterface) *WeatherByCepUsecase {
+func NewWeatherByCepUsecase(infosSearcher entity.InfosSearcherInterface, trace trace.Tracer) *WeatherByCepUsecase {
 	return &WeatherByCepUsecase{
 		infosSearcher: infosSearcher,
+		tracer: trace,
 	}
 }
 
@@ -39,17 +42,21 @@ func (w *WeatherByCepUsecase) Execute(ctx context.Context, input InputWbcUsecase
 	location.Cep = cep
 
 	var name string
+	ctx, spanFindLocationName := w.tracer.Start(ctx, "find location name")
 	name, err = w.infosSearcher.GetLocationName(cep)
 	if err != nil {
 		return OutputWbcUsecase{Err: err}
 	}
+	spanFindLocationName.End()
 	location.Name = name
 
 	var tempCelsius float32
+	_, spanFindTemps := w.tracer.Start(ctx, "find temperatures")
 	tempCelsius, err = w.infosSearcher.GetCelsiusTemp(name)
 	if err != nil {
 		return OutputWbcUsecase{Err: err}
 	}
+	spanFindTemps.End()
 	location.TempCelsius = tempCelsius
 
 	var tempFahrenheit, tempKelvin float32
