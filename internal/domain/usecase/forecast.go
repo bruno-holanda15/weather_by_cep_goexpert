@@ -60,6 +60,7 @@ func (w *WeatherByCepUsecase) Execute(ctx context.Context, input InputWbcUsecase
 	location.TempKelvin = tempKelvin
 
 	return OutputWbcUsecase{
+		LocationName:   location.Name,
 		TempCelsius:    location.TempCelsius,
 		TempFahrenheit: location.TempFahrenheit,
 		TempKelvin:     location.TempKelvin,
